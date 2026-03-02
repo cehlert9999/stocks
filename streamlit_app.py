@@ -157,7 +157,7 @@ st.sidebar.markdown(f"**Version:** {VERSION}")
 
 # Main UI
 st.title("🚀 Stock Analysis")
-st.markdown("Generate prompts for Grok.")
+st.markdown("Generate prompts for your favorite AI.")
 
 # Ticker and Strategy Selection
 ticker = st.text_input("Stock Ticker", placeholder="e.g. NVDA, AAPL").upper()
@@ -206,7 +206,7 @@ copy_button_html = f"""
             justify-content: center;
             gap: 10px;
         " onclick="copyPrompt()">
-            <span>📋 Copy for Grok</span>
+            <span>📋 Copy for AI</span>
         </button>
     </div>
 
@@ -233,4 +233,4 @@ st.components.v1.html(copy_button_html, height=80)
 # Also show the code for manual selection if needed
 st.code(final_prompt, language="markdown")
 
-st.info("💡 Tap 'Copy for Grok' and paste it directly into your chat.")
+st.info("💡 Tap 'Copy for AI' and paste it directly into your chat.")
