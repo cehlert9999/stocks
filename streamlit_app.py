@@ -3,7 +3,6 @@ import streamlit as st
 # Configuration
 VERSION = "1.0.0"
 APP_TITLE = "Stock Analysis Prompt Tool"
-PASSWORD = "stocks-research" # Simple password for protection
 
 # Page config
 st.set_page_config(page_title=APP_TITLE, page_icon="📈", layout="centered")
@@ -152,54 +151,31 @@ Write it in my voice. Direct. No hedging. This is for me, not for a research rep
     }
 ]
 
-# Authentication logic
-if "authenticated" not in st.session_state:
-    st.session_state["authenticated"] = False
+# Sidebar
+st.sidebar.title("App Settings")
+st.sidebar.markdown(f"**Version:** {VERSION}")
 
-def check_password():
-    if st.session_state["authenticated"]:
-        return True
+# Main UI
+st.title("🚀 Stock Analysis Prompt Generator")
+st.markdown("Generate high-quality prompts for Grok or other LLMs.")
+
+col1, col2 = st.columns([1, 1], gap="medium")
+
+with col1:
+    ticker = st.text_input("Stock Ticker", placeholder="e.g. NVDA, AAPL, TSLA").upper()
     
-    st.title("🔒 App Login")
-    pwd = st.text_input("Enter Password", type="password")
-    if st.button("Login"):
-        if pwd == PASSWORD:
-            st.session_state["authenticated"] = True
-            st.rerun()
-        else:
-            st.error("Invalid password.")
-    return False
+with col2:
+    strategy_titles = [p["title"] for p in PROMPTS]
+    selected_title = st.selectbox("Select Strategy", strategy_titles)
 
-if check_password():
-    # Main Sidebar
-    st.sidebar.title("App Settings")
-    if st.sidebar.button("Logout"):
-        st.session_state["authenticated"] = False
-        st.rerun()
-    
-    st.sidebar.markdown(f"**Version:** {VERSION}")
+# Get selected prompt
+selected_prompt_data = next(p for p in PROMPTS if p["title"] == selected_title)
+final_prompt = selected_prompt_data["prompt"].replace("[TICKER]", ticker if ticker else "[TICKER]")
 
-    # Main UI
-    st.title("🚀 Stock Analysis Prompt Generator")
-    st.markdown("Generate high-quality prompts for Grok or other LLMs.")
+# Display Prompt
+st.subheader("Your Prompt")
+st.markdown("Click the copy icon in the top right of the box below:")
 
-    col1, col2 = st.columns([1, 1], gap="medium")
+st.code(final_prompt, language="markdown")
 
-    with col1:
-        ticker = st.text_input("Stock Ticker", placeholder="e.g. NVDA, AAPL, TSLA").upper()
-        
-    with col2:
-        strategy_titles = [p["title"] for p in PROMPTS]
-        selected_title = st.selectbox("Select Strategy", strategy_titles)
-
-    # Get selected prompt
-    selected_prompt_data = next(p for p in PROMPTS if p["title"] == selected_title)
-    final_prompt = selected_prompt_data["prompt"].replace("[TICKER]", ticker if ticker else "[TICKER]")
-
-    # Display Prompt
-    st.subheader("Your Prompt")
-    st.markdown("Click the copy icon in the top right of the box below:")
-    
-    st.code(final_prompt, language="markdown")
-
-    st.info("💡 Copy the text above and paste it directly into Grok for a deep-dive analysis.")
+st.info("💡 Copy the text above and paste it directly into Grok for a deep-dive analysis.")
