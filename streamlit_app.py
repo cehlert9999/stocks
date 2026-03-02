@@ -68,6 +68,8 @@ with st.expander(t["help_title"], expanded=False):
 
 # Ticker and Strategy Selection
 ticker = st.text_input(t["ticker_label"], placeholder=t["ticker_placeholder"]).upper()
+if st.button(t["apply_button"], use_container_width=True):
+    pass # Streamlit reruns on interaction anyway, but button provides clear action
 
 # Optional Context
 with st.expander(t["optional_context"], expanded=False):
