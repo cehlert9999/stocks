@@ -161,12 +161,27 @@ st.markdown("Generate prompts for Grok.")
 
 # Ticker and Strategy Selection
 ticker = st.text_input("Stock Ticker", placeholder="e.g. NVDA, AAPL").upper()
+
+# Optional Context
+with st.expander("➕ Optional: Add Context (Transcript / Period)", expanded=False):
+    period = st.text_input("Quarter / Year", placeholder="e.g. Q4 2023")
+    transcript = st.text_area("Earnings Transcript or News Data", placeholder="Paste text here...", height=150)
+
 strategy_titles = [p["title"] for p in PROMPTS]
 selected_title = st.selectbox("Select Strategy", strategy_titles)
 
 # Get selected prompt
 selected_prompt_data = next(p for p in PROMPTS if p["title"] == selected_title)
-final_prompt = selected_prompt_data["prompt"].replace("[TICKER]", ticker if ticker else "[TICKER]")
+base_prompt = selected_prompt_data["prompt"].replace("[TICKER]", ticker if ticker else "[TICKER]")
+
+# Dynamic Prompt Construction
+final_prompt = base_prompt
+
+if period:
+    final_prompt = f"Target Period: {period}\n\n" + final_prompt
+
+if transcript:
+    final_prompt = f"--- UNTERLAGEN / TRANSKRIPT ---\n{transcript}\n--- ENDE UNTERLAGEN ---\n\nBasierend auf den oben genannten Unterlagen: " + final_prompt
 
 # Display Prompt
 st.subheader("Your Prompt")
