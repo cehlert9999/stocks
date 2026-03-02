@@ -156,17 +156,13 @@ st.sidebar.title("App Settings")
 st.sidebar.markdown(f"**Version:** {VERSION}")
 
 # Main UI
-st.title("🚀 Stock Analysis Prompt Generator")
-st.markdown("Generate high-quality prompts for Grok or other LLMs.")
+st.title("🚀 Stock Analysis")
+st.markdown("Generate prompts for Grok.")
 
-col1, col2 = st.columns([1, 1], gap="medium")
-
-with col1:
-    ticker = st.text_input("Stock Ticker", placeholder="e.g. NVDA, AAPL, TSLA").upper()
-    
-with col2:
-    strategy_titles = [p["title"] for p in PROMPTS]
-    selected_title = st.selectbox("Select Strategy", strategy_titles)
+# Ticker and Strategy Selection
+ticker = st.text_input("Stock Ticker", placeholder="e.g. NVDA, AAPL").upper()
+strategy_titles = [p["title"] for p in PROMPTS]
+selected_title = st.selectbox("Select Strategy", strategy_titles)
 
 # Get selected prompt
 selected_prompt_data = next(p for p in PROMPTS if p["title"] == selected_title)
@@ -174,8 +170,52 @@ final_prompt = selected_prompt_data["prompt"].replace("[TICKER]", ticker if tick
 
 # Display Prompt
 st.subheader("Your Prompt")
-st.markdown("Click the copy icon in the top right of the box below:")
 
+# Custom Copy Button using HTML/JS for prominence and mobile-friendliness
+copy_button_html = f"""
+    <div id="copy-container" style="margin-bottom: 20px;">
+        <button id="copy-btn" style="
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        " onclick="copyPrompt()">
+            <span>📋 Copy for Grok</span>
+        </button>
+    </div>
+
+    <script>
+    function copyPrompt() {{
+        const text = `{final_prompt.replace('`', '\\`').replace('$', '\\$')}`;
+        navigator.clipboard.writeText(text).then(function() {{
+            const btn = document.getElementById('copy-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ Copied!';
+            btn.style.background = '#10b981';
+            setTimeout(function() {{
+                btn.innerHTML = originalText;
+                btn.style.background = 'linear-gradient(to right, #3b82f6, #8b5cf6)';
+            }}, 2000);
+        }}, function(err) {{
+            console.error('Could not copy text: ', err);
+        }});
+    }}
+    </script>
+"""
+st.components.v1.html(copy_button_html, height=80)
+
+# Also show the code for manual selection if needed
 st.code(final_prompt, language="markdown")
 
-st.info("💡 Copy the text above and paste it directly into Grok for a deep-dive analysis.")
+st.info("💡 Tap 'Copy for Grok' and paste it directly into your chat.")
